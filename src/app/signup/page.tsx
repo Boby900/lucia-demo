@@ -3,16 +3,15 @@ import Link from "next/link";
 import { db } from "@/lib/db";
 import { hash } from "@node-rs/argon2";
 import { cookies } from "next/headers";
-import { lucia, validateRequest } from "@/lib/auth";
+import { lucia, getUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { Form } from "@/lib/form";
 import { generateId } from "lucia";
-import { SqliteError } from "better-sqlite3";
 
 import type { ActionResult } from "@/lib/form";
 
 export default async function Page() {
-	const { user } = await validateRequest();
+	const { user } = await getUser();
 	if (user) {
 		return redirect("/");
 	}
@@ -75,7 +74,7 @@ async function signup(_: any, formData: FormData): Promise<ActionResult> {
 		const sessionCookie = lucia.createSessionCookie(session.id);
 		cookies().set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes);
 	} catch (e) {
-		if (e instanceof SqliteError && e.code === "SQLITE_CONSTRAINT_UNIQUE") {
+		if (e) {
 			return {
 				error: "Username already used"
 			};

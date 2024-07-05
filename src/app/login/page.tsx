@@ -3,7 +3,7 @@ import {db} from "@/lib/db";
 
 import { verify } from "@node-rs/argon2";
 import { cookies } from "next/headers";
-import { lucia, validateRequest } from "@/lib/auth";
+import { lucia, getUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { Form } from "@/lib/form";
 
@@ -11,7 +11,7 @@ import type { DatabaseUser } from "@/lib/db";
 import type { ActionResult } from "@/lib/form";
 
 export default async function Page() {
-	const { user } = await validateRequest();
+	const { user } = await getUser();
 	if (user) {
 		return redirect("/");
 	}
