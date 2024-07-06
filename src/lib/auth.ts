@@ -2,40 +2,15 @@ import { Lucia } from "lucia";
 import { DrizzlePostgreSQLAdapter } from "@lucia-auth/adapter-drizzle";
 // import { db } from "./db";
 import pg from "pg";
-
+import { DatabaseUser } from "./schema";
 import { cookies } from "next/headers";
 import { cache } from "react";
-import { drizzle } from "drizzle-orm/node-postgres";
-import { text, pgTable, timestamp } from "drizzle-orm/pg-core";
-
-export const userTable = pgTable("user", {
-    id: text("id").primaryKey(),
-  });
-
-export const sessionTable = pgTable("session", {
-    id: text("id").primaryKey(),
-    userId: text("user_id")
-      .notNull()
-      .references(() => userTable.id),
-    expiresAt: timestamp("expires_at", {
-      withTimezone: true,
-      mode: "date",
-    }).notNull(),
-  });
-  
-
-
-export interface DatabaseUser {
-  id: string;
-  username: string;
-  github_id: number;
-}
-const pool = new pg.Pool();
-const db = drizzle(pool);
+import { sessionTable, userTable } from "./schema";
+import { db } from "./db";
 
 
 
-const adapter = new DrizzlePostgreSQLAdapter(db, sessionTable, userTable);
+export const adapter = new DrizzlePostgreSQLAdapter(db, sessionTable, userTable);
 export const lucia = new Lucia(adapter, {
   sessionCookie: {
     attributes: {

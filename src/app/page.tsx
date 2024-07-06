@@ -1,29 +1,29 @@
 import { lucia, getUser } from "@/lib/auth";
-import { Form } from "@/lib/form";
+
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 
-import type { ActionResult } from "@/lib/form";
+import { validateRequest } from "@/lib/validate";
 
 export default async function Page() {
-	const { user } = await getUser();
+	const  user  = await getUser();
 	if (!user) {
-		return redirect("/login");
+		return redirect("/sign-in");
 	}
 	return (
 		<>
 			<h1>Hi, {user.username}!</h1>
 			<p>Your user ID is {user.id}.</p>
-			<Form action={logout}>
+			<form action={logout}>
 				<button>Sign out</button>
-			</Form>
+			</form>
 		</>
 	);
 }
 
-async function logout(): Promise<ActionResult> {
+async function logout(){
 	"use server";
-	const { session } = await getUser();
+	const { session } = await validateRequest();
 	if (!session) {
 		return {
 			error: "Unauthorized"
@@ -34,5 +34,5 @@ async function logout(): Promise<ActionResult> {
 
 	const sessionCookie = lucia.createBlankSessionCookie();
 	cookies().set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes);
-	return redirect("/login");
+	return redirect("/");
 }
