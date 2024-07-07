@@ -29,15 +29,11 @@ export default async function login(formData: FormData) {
     };
   }
   
-  const exist = await db.query.userTable.findFirst({
+  const existingUser = await db.query.userTable.findFirst({
     where: eq(userTable.username, username.toLowerCase()) });
 
 
-  const existingUser = await db
-    .select()
-    .from(userTable)
-    .where(eq(userTable.username, username.toLowerCase()));
-
+  
   if (!existingUser) {
     return {
       error: "Incorrect username or password",
