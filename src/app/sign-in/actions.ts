@@ -28,6 +28,10 @@ export default async function login(formData: FormData) {
       error: "Invalid password",
     };
   }
+  
+  const exist = await db.query.userTable.findFirst({
+    where: eq(userTable.username, username.toLowerCase()) });
+
 
   const existingUser = await db
     .select()
@@ -39,7 +43,7 @@ export default async function login(formData: FormData) {
       error: "Incorrect username or password",
     };
   }
-
+  console.log(existingUser)
   const validPassword = await verify(existingUser.password_hash, password, {
     memoryCost: 19456,
     timeCost: 2,
